@@ -1,0 +1,137 @@
+cd /path/to/your/project
+git init
+pip install flask
+dex-aggregator-starter/
+python3 -m http.server
+├── python/from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "Hello, DEX Aggregator!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+    python app.py
+│   └── app.py
+├── go/package main
+
+import (
+    "fmt"
+    "net/http"
+)
+
+func hello(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Hello, DEX Aggregator!")
+}
+
+func main() {
+    http.HandleFunc("/", hello)
+    http.ListenAndServe(":8080", nil)
+}
+go run main.go
+│   └── main.go
+cargo new dex_aggregator
+cd dex_aggregator
+cargo add actix-web
+├── rust/use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Hello, DEX Aggregator!")
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new().service(hello)
+    })
+    .bind("127.0.0.1:8081")?
+    .run()
+    .await
+}
+cargo run
+mix new dex_aggregator
+cd dex_aggregator
+mix deps.get
+│   └── src/
+│       └── main.rs
+├── elixir/defmodule DexAggregator.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :dex_aggregator,
+      version: "0.1.0",
+      elixir: "~> 1.14",
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
+  end
+
+  def application do
+    [
+      extra_applications: [:logger],
+      mod: {DexAggregator.Application, []}
+    ]
+  end
+
+  defp deps do
+    [
+      {:plug_cowboy, "~> 2.5"}
+    ]
+  end
+end
+defmodule DexAggregator.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = [
+      {Plug.Cowboy, scheme: :http, plug: DexAggregator.Router, options: [port: 4000]}
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+end
+
+defmodule DexAggregator.Router do
+  use Plug.Router
+
+  plug :match
+  plug :dispatch
+
+  get "/" do
+    send_resp(conn, 200, "Hello, DEX Aggregator!")
+  end
+end
+mix run --no-halt
+stack new dex_aggregator
+cd dex_aggregator
+stack install scotty
+│   ├── lib/
+│   │   └── dex_aggregator/
+│   │       └── router.ex
+│   └── mix.exs
+├── haskell/{-# LANGUAGE OverloadedStrings #-}
+import Web.Scotty
+
+main :: IO ()
+main = scotty 3000 $ do
+  get "/" $ do
+    text "Hello, DEX Aggregator!"
+    stack exec dex_aggregator
+    luarocks install luasocket
+│   └── app.hs
+└── lua/local http = require("socket.http")
+local ltn12 = require("ltn12")
+
+local function handleRequest(req)
+    return "Hello, DEX Aggregator!"
+end
+
+http.server(function(req, res)
+    res:send(handleRequest(req))
+end):listen(8080)
+lua server.lua
+    └── server.lua
